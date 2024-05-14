@@ -1,17 +1,15 @@
-name: Move opened issues into OpenBot - To do
-
-on:
-  issues:
-    types: [opened]
-
 jobs:
   automate-project-columns:
-    runs-on: ubuntu-latest
-    # Check we are not on a fork
     if: github.repository == 'isl-org/OpenBot'
+    runs-on: self-hosted
     steps:
-      - uses: alex-page/github-project-automation-plus@v0.3.0
-        with:
-          project: OpenBot
-          column: To do
-          repo-token: ${{ secrets.GH_TOKEN }}
+    - continue-on-error: true
+      uses: alex-page/github-project-automation-plus@v0.3.0
+      with:
+        column: To do
+        project: OpenBot
+        repo-token: ${{ secrets.GH_TOKEN }}
+name: Move opened issues into OpenBot - To do
+on:
+  repository_dispatch:
+    types: trigger-ga___opened-issues-todo.yml

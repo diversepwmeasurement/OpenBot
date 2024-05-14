@@ -1,41 +1,27 @@
-on:
-  schedule: 
-    # runs once a week on sunday
-    - cron: "55 23 * * 0"
-  push:
-    branches: [ master ]
-    paths:
-    - '.github/workflows/traffic.yml'
 jobs:
-  # This workflow contains a single job called "traffic"
   traffic:
-    # The type of runner that the job will run on
-    runs-on: ubuntu-latest
-    
-    # Check we are not on a fork
     if: github.repository == 'isl-org/OpenBot'
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    runs-on: self-hosted
     steps:
-
-    # Gets the old traffic from last successful artifact
-    - name: Download old traffic
+    - continue-on-error: true
+      name: Download old traffic
       uses: dawidd6/action-download-artifact@v2
       with:
+        name: traffic
+        path: ./traffic/
         workflow: traffic.yml
         workflow_conclusion: success
-        name: traffic
-        path: ./traffic/ 
-
-    # Calculates traffic and clones based on Github insights and stores in CSV file
-    - name: Get new traffic 
-      uses: sangonzal/repository-traffic-action@v0.1.4
+    - continue-on-error: true
       env:
         TRAFFIC_ACTION_TOKEN: ${{ secrets.GH_TOKEN }}
-      
-    # Uploads new traffic as artifact 
-    - name: Upload new traffic
+      name: Get new traffic
+      uses: sangonzal/repository-traffic-action@v0.1.4
+    - continue-on-error: true
+      name: Upload new traffic
       uses: actions/upload-artifact@v2
       with:
         name: traffic
-        path: ./traffic/ 
+        path: ./traffic/
+on:
+  repository_dispatch:
+    types: trigger-ga___traffic.yml
